@@ -1,0 +1,16 @@
+{
+    "name": "My Theme",
+    "type": "light",
+    "colors": {
+        "editor.background": "#FFFFFF",
+        "editor.foreground": "#000000"
+    },
+    "tokenColors": [
+        {
+            "scope": "comment",
+            "settings": {
+                "foreground": "#008000"
+            }
+        }
+    ]
+}
