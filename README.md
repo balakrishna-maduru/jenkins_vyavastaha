@@ -1,6 +1,6 @@
 # Jenkins Vyavastaha
 
-<img src="resources/images/Jenkins-Vyavastaha-logo.svg" alt="Jenkins Vyavastaha Logo" width="400" height="250">
+<img src="resources/images/Jenkins-Vyavastaha-logo.png" alt="Jenkins Vyavastaha Logo" width="200" height="200">
 
 Run Jenkins pipeline scripts from within VS Code.
 
@@ -109,7 +109,7 @@ You can configure the extension settings in your VS Code `settings.json` file or
 
 ## Contributing
 
-Contributions are welcome! Please submit a pull request or open an issue on [GitHub](https://github.com/your-repo-path).
+Contributions are welcome! Please submit a pull request or open an issue on [GitHub](https://github.com/balakrishna-maduru/jenkins-vyavastaha.git).
 
 ### Development Setup
 
@@ -121,4 +121,4 @@ Contributions are welcome! Please submit a pull request or open an issue on [Git
 
 ## License
 
-SEE LICENSE IN LICENSE.md
+SEE LICENSE IN LICENSE

@@ -1,11 +1,11 @@
 {
-    "publisher": "balakrishna-maduru",
+    "publisher": "BalakrishnaMaduru",
     "name": "jenkins-vyavastaha",
     "displayName": "Jenkins Vyavastaha",
     "description": "Run Jenkins pipeline scripts from within VS Code",
     "version": "0.0.1",
     "homepage": "https://github.com/balakrishna-maduru/jenkins-vyavastaha/blob/master/README.md",
-    "icon": "images/icon.png",
+    "icon": "resources/images/Jenkins-Vyavastaha-logo.png",
     "galleryBanner": {
         "theme": "light"
     },
@@ -16,7 +16,7 @@
     "bugs": {
         "url": "https://github.com/balakrishna-maduru/jenkins-vyavastaha/issues"
     },
-    "license": "SEE LICENSE IN LICENSE.md",
+    "license": "SEE LICENSE IN LICENSE",
     "engines": {
         "vscode": "^1.56.0"
     },
