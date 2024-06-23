@@ -2,74 +2,75 @@ import * as vscode from "vscode";
 import * as path from "path";
 import { jenkins } from "./jenkins";
 
-// Maintain a mapping of jobName to OutputChannel for each job
 let outputChannels: { [jobName: string]: vscode.OutputChannel } = {};
+let currentPanel: vscode.WebviewPanel | undefined;
 
-/**
- * Opens a webview panel to interact with a Jenkins job.
- * @param context The extension context.
- * @param jobName The name of the Jenkins job.
- * @param parameters Array of job parameters.
- */
-export function openJobWebview(
-    context: vscode.ExtensionContext,
-    jobName: string | undefined,
-    parameters: any[]
-) {
-    const panel = vscode.window.createWebviewPanel(
-        'jenkinsJob',
-        `Jenkins Job: ${jobName || 'Unknown'}`, // Fallback for undefined jobName
-        vscode.ViewColumn.One,
-        {
-            enableScripts: true
-        }
-    );
+export function openJobWebview(context: vscode.ExtensionContext, jobName: string | undefined, parameters: any[]) {
+    const column = vscode.window.activeTextEditor ? vscode.window.activeTextEditor.viewColumn : undefined;
 
-    const cssPathOnDisk = vscode.Uri.file(path.join(context.extensionPath, 'media', 'style.css'));
-    const cssUri = panel.webview.asWebviewUri(cssPathOnDisk);
-
-    // Set the webview HTML with the dynamic CSS and HTML content
-    panel.webview.html = getWebviewContent(jobName, parameters, cssUri);
-
-    // Retrieve or create an OutputChannel for this specific job
-    const outputChannel = getOutputChannel(jobName);
-    outputChannel.show(true); // Show the output channel panel
-
-    // Handle messages from the webview
-    panel.webview.onDidReceiveMessage(
-        async message => {
-            switch (message.command) {
-                case 'runJob':
-                    try {
-                        outputChannel.appendLine(`Starting job ${jobName}...`);
-                        await startJobWithLogStream(jobName, message.parameters, outputChannel);
-                    } catch (err) {
-                        vscode.window.showErrorMessage(`Error starting job ${jobName}: ${err}`);
-                    }
-                    return;
+    // If we already have a panel, show it in the target column
+    if (currentPanel) {
+        currentPanel.reveal(column);
+        // Update the content of the existing panel
+        currentPanel.webview.html = getWebviewContent(jobName, parameters, getCssUri(context, currentPanel));
+    } else {
+        // Otherwise, create a new panel
+        currentPanel = vscode.window.createWebviewPanel(
+            'jenkinsJob',
+            `Jenkins Job: ${jobName || 'Unknown'}`, // Fallback for undefined jobName
+            column || vscode.ViewColumn.One,
+            {
+                enableScripts: true
             }
-        },
-        undefined,
-        context.subscriptions
-    );
+        );
+
+        // Set the initial HTML content
+        currentPanel.webview.html = getWebviewContent(jobName, parameters, getCssUri(context, currentPanel));
+
+        // Handle messages from the webview
+        currentPanel.webview.onDidReceiveMessage(
+            async message => {
+                switch (message.command) {
+                    case 'runJob':
+                        try {
+                            const outputChannel = getOutputChannel(jobName);
+                            outputChannel.appendLine(`Starting job ${jobName}...`);
+
+                            // Start the job and log streaming
+                            startJobWithLogStream(jobName, message.parameters, outputChannel);
+
+                            // Show the output channel for the latest triggered job
+                            outputChannel.show(true);
+
+                            // Close the panel after job run
+                            currentPanel?.dispose();
+                            currentPanel = undefined;
+                        } catch (err) {
+                            vscode.window.showErrorMessage(`Error starting job ${jobName}: ${err}`);
+                        }
+                        return;
+                }
+            },
+            undefined,
+            context.subscriptions
+        );
+
+        // Reset currentPanel when it's closed
+        currentPanel.onDidDispose(() => {
+            currentPanel = undefined;
+        });
+    }
 }
 
-/**
- * Starts a Jenkins job with given parameters and streams logs to an OutputChannel.
- * @param jobName The name of the Jenkins job.
- * @param parameters Array of job parameters.
- * @param outputChannel The VS Code OutputChannel for logging.
- */
-async function startJobWithLogStream(
-    jobName: string | undefined,
-    parameters: any[],
-    outputChannel: vscode.OutputChannel
-) {
+function getCssUri(context: vscode.ExtensionContext, panel: vscode.WebviewPanel): vscode.Uri {
+    const cssPathOnDisk = vscode.Uri.file(path.join(context.extensionPath, 'media', 'style.css'));
+    return panel.webview.asWebviewUri(cssPathOnDisk);
+}
+
+async function startJobWithLogStream(jobName: string | undefined, parameters: any[], outputChannel: vscode.OutputChannel) {
     try {
         let queueId: number;
-
-        // Build the job with parameters if available
-        if (parameters.length > 0) {
+        if (Object.keys(parameters).length > 0) {
             queueId = await jenkins.job.build({
                 name: jobName,
                 parameters: parameters
@@ -86,7 +87,7 @@ async function startJobWithLogStream(
 
         // Poll the queue item to get the build number
         const buildNumber = await getBuildNumberFromQueue(queueId);
-        
+
         outputChannel.appendLine(`Job ${jobName} started successfully. Build number: ${buildNumber}`);
 
         // Start log streaming
@@ -106,17 +107,12 @@ async function startJobWithLogStream(
     }
 }
 
-/**
- * Polls the Jenkins queue to retrieve the build number for a queued job.
- * @param queueId The queue ID of the job.
- * @returns Promise<number> The build number.
- */
 async function getBuildNumberFromQueue(queueId: number): Promise<number> {
     return new Promise((resolve, reject) => {
         const interval = setInterval(async () => {
             try {
                 const queueItem = await jenkins.queue.item(queueId);
-                
+
                 if (queueItem.executable) {
                     clearInterval(interval);
                     resolve(queueItem.executable.number);
@@ -132,11 +128,6 @@ async function getBuildNumberFromQueue(queueId: number): Promise<number> {
     });
 }
 
-/**
- * Retrieves an OutputChannel for a specific Jenkins job, creating one if it doesn't exist.
- * @param jobName The name of the Jenkins job.
- * @returns vscode.OutputChannel The OutputChannel instance.
- */
 function getOutputChannel(jobName: string | undefined): vscode.OutputChannel {
     if (!jobName) {
         throw new Error("Job name is undefined.");
@@ -147,16 +138,9 @@ function getOutputChannel(jobName: string | undefined): vscode.OutputChannel {
     return outputChannels[jobName];
 }
 
-/**
- * Generates the HTML content for the Jenkins job webview.
- * @param jobName The name of the Jenkins job.
- * @param parameters Array of job parameters.
- * @param cssUri The URI of the CSS file for styling.
- * @returns string The HTML content.
- */
 function getWebviewContent(jobName: string | undefined, parameters: any[], cssUri: vscode.Uri) {
     let paramInputs = '';
-    
+
     if (parameters.length > 0) {
         paramInputs = parameters.map(param => {
             let inputElement = '';

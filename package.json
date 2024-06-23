@@ -1,20 +1,20 @@
 {
-    "name": "jenkins_vyavastaha",
+    "publisher": "balakrishna-maduru",
+    "name": "jenkins-vyavastaha",
     "displayName": "Jenkins Vyavastaha",
     "description": "Run Jenkins pipeline scripts from within VS Code",
     "version": "0.0.1",
-    "publisher": "balakrishna-maduru",
-    "homepage": "https://github.com/balakrishna-maduru/jenkins_vyavastaha/blob/master/README.md",
+    "homepage": "https://github.com/balakrishna-maduru/jenkins-vyavastaha/blob/master/README.md",
     "icon": "images/icon.png",
     "galleryBanner": {
         "theme": "light"
     },
     "repository": {
         "type": "git",
-        "url": "https://github.com/balakrishna-maduru/jenkins_vyavastaha.git"
+        "url": "https://github.com/balakrishna-maduru/jenkins-vyavastaha.git"
     },
     "bugs": {
-        "url": "https://github.com/balakrishna-maduru/jenkins_vyavastaha/issues"
+        "url": "https://github.com/balakrishna-maduru/jenkins-vyavastaha/issues"
     },
     "license": "SEE LICENSE IN LICENSE.md",
     "engines": {
@@ -59,7 +59,7 @@
                 },
                 "jenkins.jobListFilePath": {
                     "type": "string",
-                    "default": "",
+                    "default": "${context.globalStoragePath}/list_of_jobs.json",
                     "description": "The path to the file where Jenkins jobs are stored."
                 }
             }
@@ -68,17 +68,16 @@
             {
                 "command": "listJenkinsJobs",
                 "title": "List Jenkins Jobs",
-                "category": "Jenkins Vyavastaha"
+                "category": "Jenkins Runner"
             },
             {
                 "command": "openJob",
                 "title": "Open Jenkins Job",
-                "category": "Jenkins Vyavastaha"
+                "category": "Jenkins Runner"
             },
             {
                 "command": "jenkinsJobs.refresh",
-                "title": "Refresh Jenkins Jobs",
-				"category": "Jenkins Vyavastaha"
+                "title": "Refresh Jenkins Jobs"
             }
         ],
         "viewsContainers": {
@@ -86,7 +85,7 @@
                 {
                     "id": "jenkinsVyavastaha",
                     "title": "Jenkins Vyavastaha",
-                    "icon": "resources/implode.svg",
+                    "icon": "resources/images/Jenkins-Vyavastaha-logo.svg",
                     "order": 1,
                     "when": "viewContainerVisible && activeViewlet == 'workbench.view.extension.jenkinsVyavastaha'"
                 }

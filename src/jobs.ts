@@ -45,7 +45,9 @@ export async function listJenkinsJobs(context: vscode.ExtensionContext) {
 
 export async function openJob(context: vscode.ExtensionContext, jobUrl: string) {
     try {
-        const jobName = jobUrl.split('/').filter(Boolean).pop() ?? 'unknown';
+        // Extract job name from the URL
+        const jobName = extractJobNameFromUrl(jobUrl);
+        
         if (!jenkins) {
             throw new Error('Jenkins client is not initialized.');
         }
@@ -74,6 +76,14 @@ export async function openJob(context: vscode.ExtensionContext, jobUrl: string) 
         vscode.window.showErrorMessage(`Error fetching Jenkins job details: ${errorMessage}`);
         console.error('Error fetching Jenkins job details:', err);
     }
+}
+
+function extractJobNameFromUrl(jobUrl: string): string {
+    const urlParts = jobUrl.split('/job/');
+    if (urlParts.length > 1) {
+        return urlParts.slice(1).join('/');
+    }
+    return jobUrl.split('/').filter(Boolean).pop() ?? 'unknown';
 }
 
 async function fetchJenkinsJobsFromAPI() {
@@ -139,8 +149,8 @@ function buildTreeItems(jobs: any[]): JenkinsJobTreeItem[] {
                 job.url
             );
             item.iconPath = {
-                light: vscode.Uri.file(path.join(__dirname, '../resources/light/job.svg')),
-                dark: vscode.Uri.file(path.join(__dirname, '../resources/dark/job.svg'))
+                light: vscode.Uri.file(path.join(__dirname, '../resources/images/light/Jenkins-Vyavastaha-logo-job.svg')),
+                dark: vscode.Uri.file(path.join(__dirname, '../resources/images/dark/Jenkins-Vyavastaha-logo-job.svg'))
             };
             item.command = {
                 command: 'openJob',
