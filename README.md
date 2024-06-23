@@ -1,6 +1,6 @@
 # Jenkins Vyavastaha
 
-<img src="resources/images/Jenkins-Vyavastaha-logo.svg" alt="Jenkins Vyavastaha Logo" width="200" height="200">
+<img src="resources/images/Jenkins-Vyavastaha-logo.svg" alt="Jenkins Vyavastaha Logo" width="400" height="250">
 
 Run Jenkins pipeline scripts from within VS Code.
 
@@ -53,6 +53,8 @@ You can configure the extension settings in your VS Code `settings.json` file or
 2. Type `List Jenkins Jobs` and select the command.
 3. The list of Jenkins jobs will be displayed in the Explorer view under the "Jenkins Vyavastaha" section.
 
+<img src="resources/images/job_listing.png" alt="Job Listing Logo" width="600" height="250">
+
 ### Opening a Jenkins Job
 
 1. Click on a job in the list to open its details.
@@ -69,12 +71,18 @@ You can configure the extension settings in your VS Code `settings.json` file or
 4. The webview will close immediately after clicking the `Run Job` button.
 5. The output channel for the job will be shown automatically, and the logs will be streamed.
 
+#### Job with parameters
+<img src="resources/images/job_with_params.png" alt="Job With Out Params Logo" width="800" height="250">
+
 #### Without Parameters
 
 1. If the job has no parameters, the webview will indicate that no parameters are found.
 2. Click the `Run Job` button to start the job without any parameters.
 3. The webview will close immediately after clicking the `Run Job` button.
 4. The output channel for the job will be shown automatically, and the logs will be streamed.
+
+#### Job without parameters
+<img src="resources/images/job_with_out_params.png" alt="Job With Out Params Logo" width="800" height="250">
 
 ### Refreshing Jenkins Jobs
 
@@ -89,11 +97,15 @@ You can configure the extension settings in your VS Code `settings.json` file or
 - The latest triggered job's output channel is shown automatically after the job is started.
 - To switch between output channels, use the Output view dropdown in VS Code.
 
+<img src="resources/images/log_monitoring.png" alt="Job With Out Params Logo" width="900" height="700">
+
 ### Changing Output Dropdown
 
 1. Open the Output view by clicking on the Output tab in the bottom panel of VS Code.
 2. Click on the dropdown at the top-right corner of the Output view.
 3. Select the desired output channel from the list (e.g., `Jenkins Job: <job-name>`).
+
+<img src="resources/images/log_changing_between_pipelines.png" alt="Job With Out Params Logo" width="900" height="700">
 
 ## Contributing
 

@@ -144,20 +144,10 @@ function buildTreeItems(jobs: any[]): JenkinsJobTreeItem[] {
                 buildTreeItems(job.jobs)
             );
         } else {
-            const item = createJenkinsJobTreeItem(
+            return createJenkinsJobTreeItem(
                 job.name,
                 job.url
             );
-            item.iconPath = {
-                light: vscode.Uri.file(path.join(__dirname, '../resources/images/light/Jenkins-Vyavastaha-logo-job.svg')),
-                dark: vscode.Uri.file(path.join(__dirname, '../resources/images/dark/Jenkins-Vyavastaha-logo-job.svg'))
-            };
-            item.command = {
-                command: 'openJob',
-                title: 'Open Jenkins Job',
-                arguments: [job.url]
-            };
-            return item;
         }
     });
 }

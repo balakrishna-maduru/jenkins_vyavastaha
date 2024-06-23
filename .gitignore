@@ -2,3 +2,4 @@ node_modules
 out
 .vscode
 list_of_jobs.json
+.DS_Store
