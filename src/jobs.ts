@@ -15,6 +15,7 @@ export async function listJenkinsJobs(context: vscode.ExtensionContext) {
             try {
                 const fileContent = fs.readFileSync(jobFilePath, 'utf-8');
                 jobs = JSON.parse(fileContent);
+                console.log('Loaded jobs from file:', jobs);
             } catch (err) {
                 console.error('Error reading job file, fetching from Jenkins instead:', err);
             }
@@ -23,11 +24,10 @@ export async function listJenkinsJobs(context: vscode.ExtensionContext) {
         if (!jobs || jobs.length === 0) {
             console.log('Fetching Jenkins jobs...');
             const jobsResponse = await fetchJenkinsJobsFromAPI();
+            console.log('Fetched Jenkins Jobs Response:', jobsResponse);
 
-            console.log('Fetched Jenkins Jobs:', jobsResponse);
             jobs = jobsResponse;
-
-            if (!jobs || jobs.length === 0) {
+            if (!jobs || Object.keys(jobs).length === 0) {
                 throw new Error('Jobs data is undefined or empty');
             }
 
@@ -92,12 +92,17 @@ async function fetchJenkinsJobsFromAPI() {
     }
 
     const jobsResponse = await jenkins.job.list({ tree: 'jobs[name,url,jobs[name,url]]' });
+    console.log('Raw Jenkins jobs response:', jobsResponse);
 
     if (!jobsResponse) {
         throw new Error('Received undefined response from Jenkins API');
     }
 
-    return jobsResponse.jobs;
+    if (!Object.keys(jobsResponse)) {
+        throw new Error('Jobs data is undefined or empty');
+    }
+
+    return jobsResponse;
 }
 
 function saveJobsToFile(jobFilePath: string, jobs: any) {
@@ -124,8 +129,8 @@ function updateJobListView(context: vscode.ExtensionContext, jobs: any[]) {
                 const refreshedJobs = await fetchJenkinsJobsFromAPI();
 
                 console.log('Refreshed Jenkins Jobs:', refreshedJobs);
-                saveJobsToFile(jobFilePath, refreshedJobs);
-                jobProvider.refresh(buildTreeItems(refreshedJobs));
+                saveJobsToFile(jobFilePath, refreshedJobs.jobs);
+                jobProvider.refresh(buildTreeItems(refreshedJobs.jobs));
             } catch (err) {
                 const errorMessage = (err as any).message || err;
                 vscode.window.showErrorMessage(`Error refreshing Jenkins jobs: ${errorMessage}`);

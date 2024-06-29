@@ -68,16 +68,17 @@
             {
                 "command": "listJenkinsJobs",
                 "title": "List Jenkins Jobs",
-                "category": "Jenkins Runner"
+                "category": "Jenkins Vyavastaha"
             },
             {
                 "command": "openJob",
                 "title": "Open Jenkins Job",
-                "category": "Jenkins Runner"
+                "category": "Jenkins Vyavastaha"
             },
             {
                 "command": "jenkinsJobs.refresh",
-                "title": "Refresh Jenkins Jobs"
+                "title": "Refresh Jenkins Jobs",
+                "category": "Jenkins Vyavastaha"
             }
         ],
         "viewsContainers": {

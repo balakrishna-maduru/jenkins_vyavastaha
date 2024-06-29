@@ -107,6 +107,40 @@ You can configure the extension settings in your VS Code `settings.json` file or
 
 <img src="resources/images/log_changing_between_pipelines.png" alt="Job With Out Params Logo" width="900" height="700">
 
+### Manually define jason file you can use below format
+
+```json
+[
+  {
+    "_class": "com.cloudbees.hudson.plugins.folder.Folder",
+    "name": "data_pipelines",
+    "url": "http://localhost:32000/job/data_pipelines/",
+    "jobs": [
+      {
+        "_class": "org.jenkinsci.plugins.workflow.job.WorkflowJob",
+        "name": "ShellRunner",
+        "url": "http://localhost:32000/job/data_pipelines/job/ShellRunner/"
+      }
+    ]
+  },
+  {
+    "_class": "hudson.model.FreeStyleProject",
+    "name": "DataIngestion",
+    "url": "http://localhost:32000/job/DataIngestion/"
+  },
+  {
+    "_class": "org.jenkinsci.plugins.workflow.job.WorkflowJob",
+    "name": "RunShellScript",
+    "url": "http://localhost:32000/job/RunShellScript/"
+  },
+  {
+    "_class": "org.jenkinsci.plugins.workflow.job.WorkflowJob",
+    "name": "RunShellScriptNoParams",
+    "url": "http://localhost:32000/job/RunShellScriptNoParams/"
+  }
+]
+``` 
+
 ## Contributing
 
 Contributions are welcome! Please submit a pull request or open an issue on [GitHub](https://github.com/balakrishna-maduru/jenkins-vyavastaha.git).
