@@ -21,7 +21,12 @@ Run Jenkins pipeline scripts from within VS Code.
 
 ## Configuration
 
-You can configure the extension settings in your VS Code `settings.json` file or through the settings UI.
+1. You can configure the extension settings in two ways:\
+    a. Using the VS Code settings UI. (`Ctrl+Shift+P` or `Cmd+Shift+P`) \
+    b. Type `jenkinsJobs.configure` and select the command. \
+    c. Enter the details as asked in the prompt.
+    
+2. Manually`jenkins.url`, `jenkins.username`, and `jenkins.password` settings in your VS Code `settings.json` file.
 
 ### Settings
 
