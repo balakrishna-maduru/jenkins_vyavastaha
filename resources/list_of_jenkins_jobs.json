@@ -6,6 +6,11 @@
     "jobs": [
       {
         "_class": "org.jenkinsci.plugins.workflow.job.WorkflowJob",
+        "name": "nyUnAdhika",
+        "url": "http://localhost:32000/job/data_pipelines/job/nyUnAdhika/"
+      },
+      {
+        "_class": "org.jenkinsci.plugins.workflow.job.WorkflowJob",
         "name": "ShellRunner",
         "url": "http://localhost:32000/job/data_pipelines/job/ShellRunner/"
       }
