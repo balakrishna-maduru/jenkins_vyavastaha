@@ -34,6 +34,10 @@ jobs:
         git config --global user.email "balakrishnamaduru@gmail.com"
         CURRENT_VERSION=$(jq -r '.version' package.json)
         NEW_VERSION=$(npm version patch | sed 's/v//')
+        if git rev-parse "v$NEW_VERSION" >/dev/null 2>&1; then
+          # Tag already exists, bumping version again
+          NEW_VERSION=$(npm version patch | sed 's/v//')
+        fi
         jq --arg version "$NEW_VERSION" '.version = $version' package.json > tmp.json && mv tmp.json package.json
         git add package.json
         git commit -m "Bump version to $NEW_VERSION"
