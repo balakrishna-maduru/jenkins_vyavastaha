@@ -32,12 +32,16 @@ jobs:
       run: |
         git config --global user.name "balakrishna-maduru"
         git config --global user.email "balakrishnamaduru@gmail.com"
-        CURRENT_VERSION=$(jq -r '.version' package.json)
-        NEW_VERSION=$(npm version patch | sed 's/v//')
-        if git rev-parse "v$NEW_VERSION" >/dev/null 2>&1; then
-          # Tag already exists, bumping version again
+        NEW_VERSION=""
+        while true; do
+          CURRENT_VERSION=$(jq -r '.version' package.json)
           NEW_VERSION=$(npm version patch | sed 's/v//')
-        fi
+          if git rev-parse "v$NEW_VERSION" >/dev/null 2>&1; then
+            echo "Tag v$NEW_VERSION already exists, bumping version again..."
+          else
+            break
+          fi
+        done
         jq --arg version "$NEW_VERSION" '.version = $version' package.json > tmp.json && mv tmp.json package.json
         git add package.json
         git commit -m "Bump version to $NEW_VERSION"
@@ -56,8 +60,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v${{ github.ref }}
-        release_name: Release v${{ github.ref }}
+        tag_name: v${{ steps.bump_version.outputs.NEW_VERSION }}
+        release_name: Release v${{ steps.bump_version.outputs.NEW_VERSION }}
         body: |
           ## Changes in this release
           - Describe your changes here
@@ -69,7 +73,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./*.vsix
-        asset_name: jenkins-vyavastaha-v${{ github.ref }}.vsix
+        asset_name: jenkins-vyavastaha-v${{ steps.bump_version.outputs.NEW_VERSION }}.vsix
         asset_content_type: application/octet-stream
 
     - name: Publish to Visual Studio Marketplace
