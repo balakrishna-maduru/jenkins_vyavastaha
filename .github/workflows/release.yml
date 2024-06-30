@@ -36,8 +36,7 @@ jobs:
         git config --global user.name "github-actions[bot]"
         git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
         CURRENT_VERSION=$(jq -r '.version' package.json)
-        NEW_VERSION=$(npm version patch | sed 's/v//')
-        echo "CURRENT_VERSION : $CURRENT_VERSION --> NEW_VERSION : $NEW_VERSION"
+        NEW_VERSION=$(echo $CURRENT_VERSION | awk -F. '{printf "%d.%d.%d", $1, $2, $3+1}')
         while git rev-parse "v$NEW_VERSION" >/dev/null 2>&1; do
           echo "Tag v$NEW_VERSION already exists, bumping version again..."
           NEW_VERSION=$(echo $NEW_VERSION | awk -F. '{printf "%d.%d.%d", $1, $2, $3+1}')
