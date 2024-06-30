@@ -25,16 +25,19 @@ jobs:
     - name: Install jq
       run: sudo apt-get install -y jq
 
+    - name: Clean working directory
+      run: git reset --hard HEAD
+
     - name: Bump version and update changelog
       run: |
         git config --global user.name "balakrishna-maduru"
         git config --global user.email "balakrishnamaduru@gmail.com"
         CURRENT_VERSION=$(jq -r '.version' package.json)
-        NEW_VERSION=$(npm version patch)
+        NEW_VERSION=$(npm version patch | sed 's/v//')
         jq --arg version "$NEW_VERSION" '.version = $version' package.json > tmp.json && mv tmp.json package.json
         git add package.json
         git commit -m "Bump version to $NEW_VERSION"
-        git tag -a "$NEW_VERSION" -m "Release $NEW_VERSION"
+        git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION"
         git push origin main --tags
 
     - name: Install vsce
@@ -49,8 +52,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        tag_name: v${{ github.ref }}
+        release_name: Release v${{ github.ref }}
         body: |
           ## Changes in this release
           - Describe your changes here
@@ -62,7 +65,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./*.vsix
-        asset_name: jenkins-vyavastaha-${{ github.ref }}.vsix
+        asset_name: jenkins-vyavastaha-v${{ github.ref }}.vsix
         asset_content_type: application/octet-stream
 
     - name: Publish to Visual Studio Marketplace
