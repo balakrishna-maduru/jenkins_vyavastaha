@@ -1,0 +1,71 @@
+name: Release VSIX
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch: # Allows manual execution of the workflow
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '21.2.0'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Install jq
+      run: sudo apt-get install -y jq
+
+    - name: Bump version and update changelog
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        CURRENT_VERSION=$(jq -r '.version' package.json)
+        NEW_VERSION=$(npm version patch)
+        jq --arg version "$NEW_VERSION" '.version = $version' package.json > tmp.json && mv tmp.json package.json
+        git add package.json
+        git commit -m "Bump version to $NEW_VERSION"
+        git tag -a "$NEW_VERSION" -m "Release $NEW_VERSION"
+        git push origin main --tags
+
+    - name: Install vsce
+      run: npm install -g vsce
+
+    - name: Package Extension
+      run: vsce package
+
+    - name: Create GitHub Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          ## Changes in this release
+          - Describe your changes here
+
+    - name: Upload VSIX to Release
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./*.vsix
+        asset_name: jenkins-vyavastaha-${{ github.ref }}.vsix
+        asset_content_type: application/octet-stream
+
+    - name: Publish to Visual Studio Marketplace
+      run: vsce publish -p ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}
+      env:
+        VSCODE_MARKETPLACE_TOKEN: ${{ secrets.VSCODE_MARKETPLACE_TOKEN }}

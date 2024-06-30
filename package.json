@@ -59,7 +59,7 @@
                 },
                 "jenkins.jobListFilePath": {
                     "type": "string",
-                    "default": "${context.globalStorageUri}/list_of_jobs.json",
+                    "default": "${context.globalStoragePath}/list_of_jobs.json",
                     "description": "The path to the file where Jenkins jobs are stored."
                 }
             }
@@ -83,6 +83,11 @@
             {
                 "command": "jenkinsJobs.filter",
                 "title": "Filter Jenkins Jobs",
+                "category": "Jenkins Vyavastaha"
+            },
+            {
+                "command": "jenkinsJobs.configure",
+                "title": "Configure Jenkins Settings",
                 "category": "Jenkins Vyavastaha"
             }
         ],
@@ -129,6 +134,7 @@
         "ts-node": "^10.9.2",
         "tslint": "^6.1.3",
         "typescript": "^5.4.5",
-        "vscode": "^1.1.37"
+        "vscode": "^1.1.37",
+        "vsce": "^2.3.3" 
     }
 }

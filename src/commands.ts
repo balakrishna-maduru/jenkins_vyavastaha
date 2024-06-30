@@ -32,9 +32,58 @@ export function registerCommands(context: vscode.ExtensionContext) {
         jobView.showFilterInputBox();
     });
 
-    context.subscriptions.push(listJobsCommand, openJobCommand, refreshJobsCommand, filterJobsCommand);
+    const configureJenkinsCommand = vscode.commands.registerCommand('jenkinsJobs.configure', async () => {
+        await configureJenkinsSettings();
+    });
+
+    context.subscriptions.push(listJobsCommand, openJobCommand, refreshJobsCommand, filterJobsCommand, configureJenkinsCommand);
 }
 
 export function setJobView(view: JenkinsJobView) {
     jobView = view;
+}
+
+async function configureJenkinsSettings() {
+    const config = vscode.workspace.getConfiguration('jenkins');
+
+    const url = await vscode.window.showInputBox({
+        prompt: 'Enter Jenkins URL',
+        value: config.get('url') || 'http://localhost:8080'
+    });
+
+    if (!url) {
+        vscode.window.showErrorMessage('Jenkins URL is required.');
+        return;
+    }
+
+    const username = await vscode.window.showInputBox({
+        prompt: 'Enter Jenkins Username',
+        value: config.get('username') || ''
+    });
+
+    const password = await vscode.window.showInputBox({
+        prompt: 'Enter Jenkins Password or API Token',
+        value: config.get('password') || '',
+        password: true
+    });
+
+    const crumbIssuer = await vscode.window.showQuickPick(['true', 'false'], {
+        placeHolder: 'Use Crumb Issuer?',
+        canPickMany: false,
+        ignoreFocusOut: true
+    });
+
+    const rejectUnauthorized = await vscode.window.showQuickPick(['true', 'false'], {
+        placeHolder: 'Reject Unauthorized SSL Certificates?',
+        canPickMany: false,
+        ignoreFocusOut: true
+    });
+
+    await config.update('url', url, vscode.ConfigurationTarget.Global);
+    await config.update('username', username, vscode.ConfigurationTarget.Global);
+    await config.update('password', password, vscode.ConfigurationTarget.Global);
+    await config.update('crumbIssuer', crumbIssuer === 'true', vscode.ConfigurationTarget.Global);
+    await config.update('rejectUnauthorized', rejectUnauthorized === 'true', vscode.ConfigurationTarget.Global);
+
+    vscode.window.showInformationMessage('Jenkins settings have been updated.');
 }
