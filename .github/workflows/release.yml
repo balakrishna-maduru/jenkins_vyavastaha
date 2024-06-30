@@ -30,12 +30,9 @@ jobs:
 
     - name: Bump version and update changelog
       id: bump_version
-      env:
-        TOKEN_FOR_WORKFLOW: ${{ secrets.TOKEN_FOR_WORKFLOW }}
       run: |
-        git config --global user.name "balakrishna-maduru"
-        git config --global user.email "balakrishnamaduru@gmail.com"
-        git remote set-url origin https://balakrishna-maduru:${{ secrets.TOKEN_FOR_WORKFLOW }}@github.com/balakrishna-maduru/jenkins_vyavastaha.git
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
         CURRENT_VERSION=$(jq -r '.version' package.json)
         NEW_VERSION=$(npm version patch | sed 's/v//')
         echo "CURRENT_VERSION : $CURRENT_VERSION --> NEW_VERSION : $NEW_VERSION"
@@ -50,6 +47,8 @@ jobs:
         git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION"
         git push origin master --tags
         echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Install vsce
       run: npm install -g vsce
@@ -61,7 +60,7 @@ jobs:
       id: create_release
       uses: actions/create-release@v1
       env:
-        TOKEN_FOR_WORKFLOW: ${{ secrets.TOKEN_FOR_WORKFLOW }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: v${{ env.NEW_VERSION }}
         release_name: Release v${{ env.NEW_VERSION }}
@@ -72,7 +71,7 @@ jobs:
     - name: Upload VSIX to Release
       uses: actions/upload-release-asset@v1
       env:
-        TOKEN_FOR_WORKFLOW: ${{ secrets.TOKEN_FOR_WORKFLOW }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./*.vsix
