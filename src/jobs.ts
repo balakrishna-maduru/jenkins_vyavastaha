@@ -5,7 +5,7 @@ import { jenkins } from './jenkins';
 import { openJobWebview } from './web-view';
 import { JenkinsJobProvider, JenkinsJobTreeItem, createJenkinsJobTreeItem } from './tree-view';
 
-export async function listJenkinsJobs(context: vscode.ExtensionContext) {
+export async function listJenkinsJobs(context: vscode.ExtensionContext): Promise<JenkinsJobTreeItem[]> {
     try {
         let jobFilePath = getJobListFilePath(context);
         let jobs: any[] | undefined;
@@ -21,7 +21,7 @@ export async function listJenkinsJobs(context: vscode.ExtensionContext) {
             }
         }
 
-        if (!jobs || jobs.length === 0) {
+        if (!jobs || Object.keys(jobs).length === 0) {
             console.log('Fetching Jenkins jobs...');
             const jobsResponse = await fetchJenkinsJobsFromAPI();
             console.log('Fetched Jenkins Jobs Response:', jobsResponse);
@@ -35,11 +35,12 @@ export async function listJenkinsJobs(context: vscode.ExtensionContext) {
         }
 
         vscode.window.showInformationMessage('Loaded Jenkins Jobs');
-        updateJobListView(context, jobs);
+        return buildTreeItems(jobs);
     } catch (err) {
         const errorMessage = (err as any).message || err;
         vscode.window.showErrorMessage(`Error fetching Jenkins jobs: ${errorMessage}`);
         console.error('Error fetching Jenkins jobs:', err);
+        return [];
     }
 }
 
@@ -78,7 +79,7 @@ export async function openJob(context: vscode.ExtensionContext, jobUrl: string) 
     }
 }
 
-function extractJobNameFromUrl(jobUrl: string): string {
+export function extractJobNameFromUrl(jobUrl: string): string {
     const urlParts = jobUrl.split('/job/');
     if (urlParts.length > 1) {
         return urlParts.slice(1).join('/');
@@ -86,7 +87,7 @@ function extractJobNameFromUrl(jobUrl: string): string {
     return jobUrl.split('/').filter(Boolean).pop() ?? 'unknown';
 }
 
-async function fetchJenkinsJobsFromAPI() {
+export async function fetchJenkinsJobsFromAPI() {
     if (!jenkins) {
         throw new Error('Jenkins client is not initialized.');
     }
@@ -105,7 +106,7 @@ async function fetchJenkinsJobsFromAPI() {
     return jobsResponse;
 }
 
-function saveJobsToFile(jobFilePath: string, jobs: any) {
+export function saveJobsToFile(jobFilePath: string, jobs: any) {
     try {
         const data = JSON.stringify(jobs, null, 2);
         console.log('Saving jobs to file:', jobFilePath, data);
@@ -117,7 +118,7 @@ function saveJobsToFile(jobFilePath: string, jobs: any) {
     }
 }
 
-function updateJobListView(context: vscode.ExtensionContext, jobs: any[]) {
+export function updateJobListView(context: vscode.ExtensionContext, jobs: any[]) {
     const jobItems = buildTreeItems(jobs);
     const jobProvider = new JenkinsJobProvider(jobItems);
     vscode.window.registerTreeDataProvider('jenkinsJobs', jobProvider);
@@ -129,8 +130,8 @@ function updateJobListView(context: vscode.ExtensionContext, jobs: any[]) {
                 const refreshedJobs = await fetchJenkinsJobsFromAPI();
 
                 console.log('Refreshed Jenkins Jobs:', refreshedJobs);
-                saveJobsToFile(jobFilePath, refreshedJobs.jobs);
-                jobProvider.refresh(buildTreeItems(refreshedJobs.jobs));
+                saveJobsToFile(jobFilePath, refreshedJobs);
+                jobProvider.refresh(buildTreeItems(refreshedJobs));
             } catch (err) {
                 const errorMessage = (err as any).message || err;
                 vscode.window.showErrorMessage(`Error refreshing Jenkins jobs: ${errorMessage}`);
@@ -140,7 +141,7 @@ function updateJobListView(context: vscode.ExtensionContext, jobs: any[]) {
     );
 }
 
-function buildTreeItems(jobs: any[]): JenkinsJobTreeItem[] {
+export function buildTreeItems(jobs: any[]): JenkinsJobTreeItem[] {
     return jobs.map(job => {
         if (job.jobs && job.jobs.length > 0) {
             return createJenkinsJobTreeItem(
@@ -157,7 +158,7 @@ function buildTreeItems(jobs: any[]): JenkinsJobTreeItem[] {
     });
 }
 
-function getJobListFilePath(context: vscode.ExtensionContext): string {
+export function getJobListFilePath(context: vscode.ExtensionContext): string {
     const defaultFilePath = path.join(context.globalStorageUri.fsPath, 'list_of_jobs.json');
     const config = vscode.workspace.getConfiguration('jenkins');
     const customJobFilePath = config.get<string>('jobListFilePath');
@@ -165,11 +166,11 @@ function getJobListFilePath(context: vscode.ExtensionContext): string {
     return customJobFilePath || defaultFilePath;
 }
 
-function getJobNameFromUrl(jobUrl: string): string {
+export function getJobNameFromUrl(jobUrl: string): string {
     return jobUrl.split('/').filter(Boolean).pop() ?? 'unknown';
 }
 
-function extractJobParameters(job: any): any[] {
+export function extractJobParameters(job: any): any[] {
     let parameters = [];
     if (job.property) {
         for (let prop of job.property) {

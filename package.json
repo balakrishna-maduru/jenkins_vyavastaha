@@ -59,7 +59,7 @@
                 },
                 "jenkins.jobListFilePath": {
                     "type": "string",
-                    "default": "${context.globalStoragePath}/list_of_jobs.json",
+                    "default": "${context.globalStorageUri}/list_of_jobs.json",
                     "description": "The path to the file where Jenkins jobs are stored."
                 }
             }
@@ -78,6 +78,11 @@
             {
                 "command": "jenkinsJobs.refresh",
                 "title": "Refresh Jenkins Jobs",
+                "category": "Jenkins Vyavastaha"
+            },
+            {
+                "command": "jenkinsJobs.filter",
+                "title": "Filter Jenkins Jobs",
                 "category": "Jenkins Vyavastaha"
             }
         ],

@@ -4,8 +4,11 @@ import * as path from "path";
 export class JenkinsJobProvider implements vscode.TreeDataProvider<JenkinsJobTreeItem> {
     private _onDidChangeTreeData: vscode.EventEmitter<JenkinsJobTreeItem | undefined> = new vscode.EventEmitter<JenkinsJobTreeItem | undefined>();
     readonly onDidChangeTreeData: vscode.Event<JenkinsJobTreeItem | undefined> = this._onDidChangeTreeData.event;
+    private allJobItems: JenkinsJobTreeItem[];
 
-    constructor(private jobItems: JenkinsJobTreeItem[]) {}
+    constructor(private jobItems: JenkinsJobTreeItem[]) {
+        this.allJobItems = jobItems;
+    }
 
     getTreeItem(element: JenkinsJobTreeItem): vscode.TreeItem {
         return element;
@@ -21,7 +24,30 @@ export class JenkinsJobProvider implements vscode.TreeDataProvider<JenkinsJobTre
 
     refresh(jobItems: JenkinsJobTreeItem[]): void {
         this.jobItems = jobItems;
+        this.allJobItems = jobItems;
         this._onDidChangeTreeData.fire(undefined);
+    }
+
+    filter(regex: RegExp): void {
+        this.jobItems = this.filterItems(this.allJobItems, regex);
+        this._onDidChangeTreeData.fire(undefined);
+    }
+
+    private filterItems(items: JenkinsJobTreeItem[], regex: RegExp): JenkinsJobTreeItem[] {
+        return items
+            .map(item => {
+                if (item.children) {
+                    const filteredChildren = this.filterItems(item.children, regex);
+                    if (filteredChildren.length > 0) {
+                        return new JenkinsJobTreeItem(item.label, item.collapsibleState, item.url, item.command, filteredChildren, true);
+                    }
+                }
+                if (regex.test(item.label)) {
+                    return item;
+                }
+                return null;
+            })
+            .filter(item => item !== null) as JenkinsJobTreeItem[];
     }
 }
 
