@@ -13,6 +13,8 @@ jobs:
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Set up Node.js
       uses: actions/setup-node@v2
@@ -45,6 +47,7 @@ jobs:
         git add package.json
         git commit -m "Bump version to $NEW_VERSION"
         git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION"
+        git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/balakrishna-maduru/jenkins_vyavastaha.git
         git push origin master --tags
         echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
       env:
@@ -55,6 +58,11 @@ jobs:
 
     - name: Package Extension
       run: vsce package
+      env:
+        NEW_VERSION: ${{ env.NEW_VERSION }}
+
+    - name: Verify VSIX File Exists
+      run: ls -la ./*.vsix
 
     - name: Create GitHub Release
       id: create_release
@@ -74,7 +82,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./*.vsix
+        asset_path: ./jenkins-vyavastaha-${{ env.NEW_VERSION }}.vsix
         asset_name: jenkins-vyavastaha-v${{ env.NEW_VERSION }}.vsix
         asset_content_type: application/octet-stream
 
