@@ -46,8 +46,7 @@ jobs:
         git commit -m "Bump version to $NEW_VERSION"
         git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION"
         git push origin master --tags
-      outputs:
-        NEW_VERSION: $NEW_VERSION
+        echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
     - name: Install vsce
       run: npm install -g vsce
@@ -61,8 +60,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v${{ steps.bump_version.outputs.NEW_VERSION }}
-        release_name: Release v${{ steps.bump_version.outputs.NEW_VERSION }}
+        tag_name: v${{ env.NEW_VERSION }}
+        release_name: Release v${{ env.NEW_VERSION }}
         body: |
           ## Changes in this release
           - Describe your changes here
@@ -74,7 +73,7 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./*.vsix
-        asset_name: jenkins-vyavastaha-v${{ steps.bump_version.outputs.NEW_VERSION }}.vsix
+        asset_name: jenkins-vyavastaha-v${{ env.NEW_VERSION }}.vsix
         asset_content_type: application/octet-stream
 
     - name: Publish to Visual Studio Marketplace
