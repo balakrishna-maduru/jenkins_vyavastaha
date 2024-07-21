@@ -1,6 +1,6 @@
 # Jenkins Vyavastaha
 
-<img src="resources/images/Jenkins-Vyavastaha-logo.png" alt="Jenkins Vyavastaha Logo" width="200" height="200">
+<img src="./resources/images/Jenkins-Vyavastaha-logo.png" alt="Jenkins Vyavastaha Logo" width="200" height="200">
 
 Run Jenkins pipeline scripts from within VS Code.
 
@@ -58,7 +58,7 @@ Run Jenkins pipeline scripts from within VS Code.
 2. Type `List Jenkins Jobs` and select the command.
 3. The list of Jenkins jobs will be displayed in the Explorer view under the "Jenkins Vyavastaha" section.
 
-<img src="resources/images/job_listing.png" alt="Job Listing Logo" width="600" height="250">
+<img src="./resources/images/job_listing.png" alt="Job Listing Logo" width="600" height="250">
 
 ### Opening a Jenkins Job
 
@@ -77,7 +77,7 @@ Run Jenkins pipeline scripts from within VS Code.
 5. The output channel for the job will be shown automatically, and the logs will be streamed.
 
 #### Job with parameters
-<img src="resources/images/job_with_params.png" alt="Job With Out Params Logo" width="800" height="250">
+<img src="./resources/images/job_with_params.png" alt="Job With Out Params Logo" width="800" height="250">
 
 #### Without Parameters
 
@@ -87,7 +87,7 @@ Run Jenkins pipeline scripts from within VS Code.
 4. The output channel for the job will be shown automatically, and the logs will be streamed.
 
 #### Job without parameters
-<img src="resources/images/job_with_out_params.png" alt="Job With Out Params Logo" width="800" height="250">
+<img src="./resources/images/job_with_out_params.png" alt="Job With Out Params Logo" width="800" height="250">
 
 ### Refreshing Jenkins Jobs
 
@@ -102,7 +102,7 @@ Run Jenkins pipeline scripts from within VS Code.
 - The latest triggered job's output channel is shown automatically after the job is started.
 - To switch between output channels, use the Output view dropdown in VS Code.
 
-<img src="resources/images/log_monitoring.png" alt="Job With Out Params Logo" width="900" height="700">
+<img src="./resources/images/log_monitoring.png" alt="Job With Out Params Logo" width="900" height="700">
 
 ### Changing Output Dropdown
 
@@ -110,7 +110,7 @@ Run Jenkins pipeline scripts from within VS Code.
 2. Click on the dropdown at the top-right corner of the Output view.
 3. Select the desired output channel from the list (e.g., `Jenkins Job: <job-name>`).
 
-<img src="resources/images/log_changing_between_pipelines.png" alt="Job With Out Params Logo" width="900" height="700">
+<img src="./resources/images/log_changing_between_pipelines.png" alt="Job With Out Params Logo" width="900" height="700">
 
 ### Manually define jason file you can use below format
 
