@@ -3,7 +3,7 @@
   "name": "jenkins-vyavastaha",
   "displayName": "Jenkins Vyavastaha",
   "description": "Run Jenkins pipeline scripts from within VS Code",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "homepage": "https://github.com/balakrishna-maduru/jenkins_vyavastaha/blob/master/README.md",
   "icon": "resources/images/Jenkins-Vyavastaha-logo.png",
   "galleryBanner": {
